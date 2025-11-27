@@ -30,10 +30,31 @@ Las imágenes se almacenan en GitHub Container Registry (ghcr.io) automáticamen
 
 ### 2. Configurar Secrets en GitHub
 
-En tu repositorio: Settings → Secrets and variables → Actions
+En tu repositorio: Settings → Secrets and variables → Actions → New repository secret
 
-Agregar:
-- `PORTAINER_WEBHOOK_URL`: URL del webhook de Portainer (ver paso 5)
+Agregar los siguientes secrets:
+
+1. **VPS_HOST**: IP de tu VPS (ejemplo: `123.45.67.89`)
+2. **VPS_USER**: Usuario SSH (normalmente `root`)
+3. **VPS_SSH_KEY**: Clave privada SSH para acceder al VPS (ver instrucciones abajo)
+
+#### Generar y configurar SSH Key:
+
+**En tu máquina local:**
+```bash
+# Generar clave SSH (si no tienes una)
+ssh-keygen -t ed25519 -C "github-actions" -f ~/.ssh/github_actions_key
+
+# Copiar clave pública al VPS
+ssh-copy-id -i ~/.ssh/github_actions_key.pub root@TU_VPS_IP
+
+# Mostrar clave privada para copiarla a GitHub
+cat ~/.ssh/github_actions_key
+```
+
+**En GitHub:**
+- Copia TODO el contenido de la clave privada (desde `-----BEGIN` hasta `-----END`)
+- Pégalo en el secret `VPS_SSH_KEY`
 
 ### 3. Crear Sitio en CloudPanel
 
@@ -45,43 +66,46 @@ Agregar:
    - **SSL**: Habilitar Let's Encrypt
 4. Click "Create"
 
-### 4. Configurar Stack en Portainer
+### 4. Crear docker-compose.prod.yml en el VPS
 
-1. Accede a Portainer
-2. Selecciona tu environment local
-3. Stacks → Add stack
-4. Configuración:
-   - **Name**: `gestion-encuestas`
-   - **Build method**: Git Repository
-   - **Repository URL**: `https://github.com/lmcadev/gestion_encuestas`
-   - **Repository reference**: `refs/heads/main`
-   - **Compose path**: `docker-compose.prod.yml`
-   - **Authentication**: None (si el repo es público)
+**Conéctate a tu VPS:**
+```bash
+ssh root@TU_VPS_IP
 
-5. **Environment variables**:
-   ```
-   POSTGRES_DB=encuestas_prod
-   POSTGRES_USER=encuestas_user
-   POSTGRES_PASSWORD=TU_PASSWORD_SEGURO_AQUI
-   JWT_SECRET=TU_JWT_SECRET_DE_32_CARACTERES_MINIMO
-   JWT_EXPIRATION=3600000
-   ```
+# Crear directorio para el proyecto
+mkdir -p /opt/gestion-encuestas
+cd /opt/gestion-encuestas
 
-6. Click "Deploy the stack"
+# Descargar docker-compose.prod.yml
+curl -o docker-compose.prod.yml https://raw.githubusercontent.com/lmcadev/gestion_encuestas/main/docker-compose.prod.yml
 
-### 5. Configurar Webhook de Portainer
+# Crear archivo .env con variables de entorno
+nano .env
+```
 
-1. En Portainer, ve a **Stacks** en el menú lateral
-2. Busca tu stack `gestion-encuestas` en la lista
-3. Click en el nombre del stack para entrar a los detalles
-4. En la parte superior, busca el botón/ícono de **webhook** (puede ser un ícono de cadena/link o dice "Webhook")
-   - Si no lo ves, haz click en los tres puntos (⋮) o menú de opciones del stack
-5. Click en **"Create a service webhook"** o **"Add webhook"**
-6. Selecciona el servicio a actualizar (puedes crear uno para `frontend` y otro para `backend`, o uno general para el stack)
-7. Copia la URL generada (algo como: `https://tu-ip:9443/api/stacks/webhooks/xxx-xxx-xxx`)
-8. Agrégala como secret `PORTAINER_WEBHOOK_URL` en GitHub (Settings → Secrets and variables → Actions → New repository secret)
+**Contenido del archivo .env:**
+```env
+POSTGRES_DB=encuestas_prod
+POSTGRES_USER=encuestas_user
+POSTGRES_PASSWORD=TU_PASSWORD_SEGURO_AQUI
+JWT_SECRET=TU_JWT_SECRET_DE_32_CARACTERES_MINIMO
+JWT_EXPIRATION=3600000
+```
 
-**Nota**: Si no encuentras la opción de webhook en tu versión de Portainer, es posible que necesites actualizar el stack manualmente o configurar un despliegue por pull automático desde Git.
+**Iniciar los contenedores:**
+```bash
+docker compose -f docker-compose.prod.yml up -d
+```
+
+### 5. Verificar que los contenedores estén corriendo
+
+```bash
+# Ver contenedores activos
+docker ps
+
+# Ver logs
+docker compose -f docker-compose.prod.yml logs -f
+```
 
 ### 6. Configurar DNS
 
@@ -150,28 +174,42 @@ server {
 2. **GitHub Actions se ejecuta automáticamente**
    - Construye imágenes Docker de backend y frontend
    - Las sube a GitHub Container Registry
-   - Ejecuta webhook de Portainer
+   - Se conecta por SSH al VPS
+   - Hace pull de las nuevas imágenes
+   - Recrea los contenedores
 
-3. **Portainer recibe webhook**
-   - Pull de nuevas imágenes desde ghcr.io
-   - Recrea contenedores con nuevas versiones
+3. **Contenedores actualizados en VPS**
    - Zero-downtime deployment
-
-4. **Aplicación actualizada**
    - Disponible en https://encuesta.lmcadev.com
 
 ## Comandos Útiles
 
 ### Ver logs en Portainer
 ```bash
-# Desde Portainer UI:
-# Stacks → gestion-encuestas → Logs
+# SSH al VPS
+ssh root@tu-vps-ip
+
+# Ver logs en tiempo real
+cd /opt/gestion-encuestas
+docker compose -f docker-compose.prod.yml logs -f
+
+# Ver logs de un servicio específico
+docker compose -f docker-compose.prod.yml logs -f frontend
+docker compose -f docker-compose.prod.yml logs -f backend
+docker compose -f docker-compose.prod.yml logs -f db
 ```
 
 ### Actualizar stack manualmente
 ```bash
-# En Portainer:
-# Stacks → gestion-encuestas → Update the stack → Pull and redeploy
+# Conéctate por SSH al VPS
+ssh root@tu-vps-ip
+
+# Ve al directorio del proyecto
+cd /opt/gestion-encuestas
+
+# Pull de nuevas imágenes y recrear contenedores
+docker compose -f docker-compose.prod.yml pull
+docker compose -f docker-compose.prod.yml up -d --force-recreate
 ```
 
 ### Verificar puertos en VPS
@@ -182,10 +220,11 @@ ssh root@tu-vps-ip
 # Ver contenedores
 docker ps
 
-# Ver logs
-docker logs gestion-encuestas-frontend-1
-docker logs gestion-encuestas-backend-1
-docker logs gestion-encuestas-db-1
+# Ver logs de contenedores específicos
+cd /opt/gestion-encuestas
+docker compose -f docker-compose.prod.yml logs frontend
+docker compose -f docker-compose.prod.yml logs backend
+docker compose -f docker-compose.prod.yml logs db
 
 # Verificar puerto 3000
 netstat -tlnp | grep 3000
@@ -198,7 +237,9 @@ netstat -tlnp | grep 3000
 Verificar que el frontend tenga acceso al backend a través de la red Docker:
 
 ```bash
-docker exec -it gestion-encuestas-frontend-1 ping backend
+# SSH al VPS
+cd /opt/gestion-encuestas
+docker compose -f docker-compose.prod.yml exec frontend ping backend
 ```
 
 ### Error: SSL no funciona
@@ -207,11 +248,14 @@ docker exec -it gestion-encuestas-frontend-1 ping backend
 2. Esperar propagación DNS (hasta 24h)
 3. Forzar renovación en CloudPanel
 
-### Error: Portainer no actualiza
+### Error: GitHub Actions falla en deploy
 
-1. Verificar webhook URL en secrets de GitHub
-2. Ver logs de GitHub Actions
-3. Actualizar manualmente: Portainer → Stack → Pull and redeploy
+1. Verificar que los secrets estén correctamente configurados en GitHub
+2. Probar conexión SSH manualmente desde tu máquina:
+   ```bash
+   ssh -i ~/.ssh/github_actions_key root@TU_VPS_IP
+   ```
+3. Ver logs de GitHub Actions en la pestaña "Actions" del repositorio
 
 ## Seguridad
 
@@ -270,16 +314,22 @@ logging:
 
 Si hay problemas con el despliegue:
 
-1. En Portainer → Stacks → gestion-encuestas
-2. Edit stack
-3. Cambiar tag de imágenes:
-   ```yaml
-   backend:
-     image: ghcr.io/lmcadev/gestion_encuestas/backend:main-abc123
-   frontend:
-     image: ghcr.io/lmcadev/gestion_encuestas/frontend:main-abc123
-   ```
-4. Update the stack
+```bash
+# SSH al VPS
+ssh root@tu-vps-ip
+cd /opt/gestion-encuestas
+
+# Editar docker-compose.prod.yml y cambiar tags de imágenes
+nano docker-compose.prod.yml
+
+# Cambiar de:
+# image: ghcr.io/lmcadev/gestion_encuestas/backend:latest
+# A una versión específica:
+# image: ghcr.io/lmcadev/gestion_encuestas/backend:main-abc123
+
+# Recrear contenedores
+docker compose -f docker-compose.prod.yml up -d --force-recreate
+```
 
 ## Costos
 
