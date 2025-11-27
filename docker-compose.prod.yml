@@ -26,7 +26,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
     ports:
-      - "127.0.0.1:8080:8080"  # Solo accesible desde localhost
+      - "127.0.0.1:8081:8080"  # Solo accesible desde localhost en puerto 8081
     networks:
       - encuestas-net
 

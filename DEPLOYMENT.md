@@ -8,11 +8,11 @@ Internet
 CloudPanel Nginx (encuesta.lmcadev.com:443 - SSL)
     ↓
     ├── / → localhost:3000 (Frontend Container)
-    └── /api/* → localhost:8080 (Backend Container)
+    └── /api/* → localhost:8081 (Backend Container)
     ↓
 Docker Containers (Portainer)
     - frontend:80 → expuesto como 127.0.0.1:3000
-    - backend:8080 → expuesto como 127.0.0.1:8080
+    - backend:8080 → expuesto como 127.0.0.1:8081
     - postgres:5432 (interno)
 ```
 
@@ -133,7 +133,7 @@ server {
 
     # Backend API - Todas las rutas /api/*
     location /api/ {
-        proxy_pass http://127.0.0.1:8080;
+        proxy_pass http://127.0.0.1:8081;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -148,7 +148,7 @@ server {
 
     # Swagger UI (opcional, solo para desarrollo)
     location /swagger-ui/ {
-        proxy_pass http://127.0.0.1:8080;
+        proxy_pass http://127.0.0.1:8081;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
     }
