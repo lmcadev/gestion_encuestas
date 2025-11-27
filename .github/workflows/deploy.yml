@@ -77,7 +77,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Trigger Portainer Stack Redeploy
+      - name: Trigger Portainer Webhook
         run: |
-          echo "Las imágenes se han subido a GitHub Container Registry"
-          echo "Actualiza el stack manualmente en Portainer: Pull and redeploy"
+          curl -X POST ${{ secrets.PORTAINER_WEBHOOK_URL }}
+          echo "✅ Webhook enviado a Portainer para actualizar el stack"
