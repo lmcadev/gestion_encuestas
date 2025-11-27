@@ -77,13 +77,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Deploy to VPS via SSH
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          script: |
-            cd /opt/portainer-data
-            docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d --force-recreate
+      - name: Trigger Portainer Stack Redeploy
+        run: |
+          echo "Las imágenes se han subido a GitHub Container Registry"
+          echo "Actualiza el stack manualmente en Portainer: Pull and redeploy"
