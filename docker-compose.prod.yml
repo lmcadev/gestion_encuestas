@@ -25,7 +25,8 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
-    # No exponemos el puerto 8080 externamente, solo se comunica internamente
+    ports:
+      - "127.0.0.1:8080:8080"  # Solo accesible desde localhost
     networks:
       - encuestas-net
 

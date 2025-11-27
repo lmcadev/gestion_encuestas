@@ -7,11 +7,12 @@ Internet
     ↓
 CloudPanel Nginx (encuesta.lmcadev.com:443 - SSL)
     ↓
-Reverse Proxy → localhost:3000
+    ├── / → localhost:3000 (Frontend Container)
+    └── /api/* → localhost:8080 (Backend Container)
     ↓
 Docker Containers (Portainer)
-    - frontend:80 → expuesto como :3000
-    - backend:8080 (interno)
+    - frontend:80 → expuesto como 127.0.0.1:3000
+    - backend:8080 → expuesto como 127.0.0.1:8080
     - postgres:5432 (interno)
 ```
 
@@ -99,28 +100,27 @@ Value: [IP_DE_TU_VPS]
 TTL: 3600
 ```
 
-### 7. Verificar Configuración de Nginx (CloudPanel)
+### 7. Configurar Nginx en CloudPanel
 
-CloudPanel crea automáticamente la configuración, pero verifica:
+**IMPORTANTE**: Necesitas configurar el proxy tanto para el frontend como para el backend.
+
+1. En CloudPanel → Sites → encuesta.lmcadev.com
+2. Click en **"Vhost"** o **"Nginx Settings"**
+3. Edita la configuración del bloque `server` con SSL (443):
 
 ```nginx
-server {
-    listen 80;
-    listen [::]:80;
-    server_name encuesta.lmcadev.com;
-    return 301 https://$host$request_uri;
-}
-
 server {
     listen 443 ssl http2;
     listen [::]:443 ssl http2;
     server_name encuesta.lmcadev.com;
 
-    ssl_certificate /path/to/cert;
-    ssl_certificate_key /path/to/key;
+    # Certificados SSL (CloudPanel los configura automáticamente)
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
 
+    # Frontend - Todas las rutas excepto /api
     location / {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -131,16 +131,35 @@ server {
         proxy_cache_bypass $http_upgrade;
     }
 
-    # Proxy para API backend
+    # Backend API - Todas las rutas /api/*
     location /api/ {
-        proxy_pass http://localhost:8080;
+        proxy_pass http://127.0.0.1:8080;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        
+        # Timeouts para requests largos
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+
+    # Swagger UI (opcional, solo para desarrollo)
+    location /swagger-ui/ {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
     }
 }
+```
+
+4. **Reload Nginx**:
+```bash
+# En tu VPS
+sudo systemctl reload nginx
+# O desde CloudPanel UI
 ```
 
 ## Flujo de Despliegue Continuo
