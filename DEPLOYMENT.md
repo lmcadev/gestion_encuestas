@@ -7,10 +7,10 @@ Internet
     ↓
 CloudPanel Nginx (encuesta.lmcadev.com:443 - SSL)
     ↓
-Reverse Proxy → localhost:5173
+Reverse Proxy → localhost:3000
     ↓
 Docker Containers (Portainer)
-    - frontend:80 → expuesto como :5173
+    - frontend:80 → expuesto como :3000
     - backend:8080 (interno)
     - postgres:5432 (interno)
 ```
@@ -41,7 +41,7 @@ Agregar:
 2. Sites → Add Site → Reverse Proxy
 3. Configuración:
    - **Domain**: `encuesta.lmcadev.com`
-   - **Reverse Proxy URL**: `http://localhost:5173`
+   - **Reverse Proxy URL**: `http://localhost:3000`
    - **SSL**: Habilitar Let's Encrypt
 4. Click "Create"
 
@@ -110,7 +110,7 @@ server {
     ssl_certificate_key /path/to/key;
 
     location / {
-        proxy_pass http://localhost:5173;
+        proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -182,8 +182,8 @@ docker logs gestion-encuestas-frontend-1
 docker logs gestion-encuestas-backend-1
 docker logs gestion-encuestas-db-1
 
-# Verificar puerto 5173
-netstat -tlnp | grep 5173
+# Verificar puerto 3000
+netstat -tlnp | grep 3000
 ```
 
 ## Troubleshooting
