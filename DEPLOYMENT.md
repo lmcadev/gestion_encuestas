@@ -71,12 +71,17 @@ Agregar:
 
 ### 5. Configurar Webhook de Portainer
 
-1. En Portainer, ve a tu stack `gestion-encuestas`
-2. Click en el ícono de engranaje (Settings)
-3. Scroll hasta "Webhooks"
-4. Click "Add webhook"
-5. Copia la URL generada
-6. Agrégala como secret `PORTAINER_WEBHOOK_URL` en GitHub
+1. En Portainer, ve a **Stacks** en el menú lateral
+2. Busca tu stack `gestion-encuestas` en la lista
+3. Click en el nombre del stack para entrar a los detalles
+4. En la parte superior, busca el botón/ícono de **webhook** (puede ser un ícono de cadena/link o dice "Webhook")
+   - Si no lo ves, haz click en los tres puntos (⋮) o menú de opciones del stack
+5. Click en **"Create a service webhook"** o **"Add webhook"**
+6. Selecciona el servicio a actualizar (puedes crear uno para `frontend` y otro para `backend`, o uno general para el stack)
+7. Copia la URL generada (algo como: `https://tu-ip:9443/api/stacks/webhooks/xxx-xxx-xxx`)
+8. Agrégala como secret `PORTAINER_WEBHOOK_URL` en GitHub (Settings → Secrets and variables → Actions → New repository secret)
+
+**Nota**: Si no encuentras la opción de webhook en tu versión de Portainer, es posible que necesites actualizar el stack manualmente o configurar un despliegue por pull automático desde Git.
 
 ### 6. Configurar DNS
 
