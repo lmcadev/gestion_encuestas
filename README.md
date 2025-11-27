@@ -335,7 +335,6 @@ Ver archivo `diagrama E-TECH_STORE.jpg` en la raíz del proyecto para el diagram
 
 - [README Backend](./backend/README.md) - Documentación detallada del backend
 - [README Frontend](./frontend/README.md) - Documentación detallada del frontend
-- [API Documentation](./API-DOCUMENTATION.md) - Especificación completa de la API
 - [Security Audit](./SECURITY_AUDIT.md) - Auditoría de seguridad
 
 ## Roadmap
@@ -348,43 +347,13 @@ Ver archivo `diagrama E-TECH_STORE.jpg` en la raíz del proyecto para el diagram
 - [ ] Internacionalización (i18n)
 - [ ] PWA (Progressive Web App)
 
-## Contribución
-
-Este es un proyecto académico. Para contribuir:
-
-1. Fork del repositorio
-2. Crear rama feature: `git checkout -b feature/nueva-funcionalidad`
-3. Commit: `git commit -am 'Agregar funcionalidad X'`
-4. Push: `git push origin feature/nueva-funcionalidad`
-5. Crear Pull Request
-
-## Solución de Problemas
-
-### Error de conexión a base de datos
-
-```bash
-# Verificar estado de PostgreSQL
-docker-compose ps db
-
-# Ver logs de la base de datos
-docker-compose logs db
-```
-
-### Frontend no conecta con backend
-
-Verificar proxy en `vite.config.js` y CORS en `SecurityConfig.java`
-
-### Token JWT inválido
-
-Asegurar que `JWT_SECRET` tenga al menos 32 caracteres en `.env`
-
 ## Licencia
 
 Proyecto académico desarrollado con fines educativos.
 
 ## Autor
 
-Luis Miguel Castillo Acevedo
+Luis Miguel Castañeda Arciniegas
 
 ## Contacto
 

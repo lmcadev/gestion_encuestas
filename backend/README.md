@@ -274,15 +274,6 @@ Asegurarse de que `JWT_SECRET` tenga al menos 32 caracteres.
 
 La configuración actual permite todos los orígenes en desarrollo. Para producción, especificar orígenes permitidos.
 
-## Contribución
-
-Este proyecto es de carácter académico. Para contribuir:
-
-1. Fork del repositorio
-2. Crear rama feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit de cambios (`git commit -am 'Agregar nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Crear Pull Request
 
 ## Licencia
 

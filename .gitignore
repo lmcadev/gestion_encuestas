@@ -42,3 +42,5 @@ yarn-error.log*
 
 # Docker volumes
 postgres-data/
+
+API-DOCUMENTATION.md
