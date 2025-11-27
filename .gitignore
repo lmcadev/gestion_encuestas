@@ -1,0 +1,44 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+
+# Backend - Maven
+backend/target/
+backend/.mvn/
+backend/mvnw
+backend/mvnw.cmd
+backend/.classpath
+backend/.project
+backend/.settings/
+backend/.factorypath
+
+# Frontend - Node
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.vite/
+frontend/.cache/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker volumes
+postgres-data/

@@ -1,0 +1,28 @@
+<svg width="400" height="120" viewBox="0 0 400 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Degradado azul del ícono -->
+    <linearGradient id="etechGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1D4ED8"></stop>
+      <stop offset="100%" stop-color="#3B82F6"></stop>
+    </linearGradient>
+  </defs>
+
+  <!-- Ícono cuadrado redondeado -->
+  <rect x="20" y="20" width="80" height="80" rx="20" ry="20" fill="url(#etechGradient)"></rect>
+
+  <!-- Globo de diálogo -->
+  <path d="M42 44 h36 a6 6 0 0 1 6 6 v22 a6 6 0 0 1 -6 6 h-18 l-6 7 -2 -7 h-10 a6 6 0 0 1 -6 -6 v-22 a6 6 0 0 1 6 -6 z" fill="#FFFFFF"></path>
+
+  <!-- Tres puntos del globo -->
+  <circle cx="52" cy="60" r="3" fill="#1D4ED8"></circle>
+  <circle cx="62" cy="60" r="3" fill="#1D4ED8"></circle>
+  <circle cx="72" cy="60" r="3" fill="#1D4ED8"></circle>
+
+  <!-- Texto E-TECH STORE -->
+  <text x="120" y="56" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="26" font-weight="700" fill="#1E293B">
+    E-TECH
+  </text>
+  <text x="120" y="88" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="26" font-weight="700" fill="#1E293B">
+    STORE
+  </text>
+</svg>

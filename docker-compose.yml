@@ -1,0 +1,47 @@
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-monorepo}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - mononet
+
+  backend:
+    build:
+      context: ./backend
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: ${DB_URL:-jdbc:postgresql://db:5432/monorepo}
+      SPRING_DATASOURCE_USERNAME: ${DB_USERNAME:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD:-postgres}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      JWT_SECRET: ${JWT_SECRET:-MiClaveSecretaParaJWT123456789SuperSeguraYLarga32CaracteresMinimo}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
+    ports:
+      - "8080:8080"
+    networks:
+      - mononet
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - mononet
+
+volumes:
+  postgres-data:
+networks:
+  mononet:
+    driver: bridge
