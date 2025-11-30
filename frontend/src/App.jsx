@@ -5,6 +5,7 @@ import Survey from './pages/Survey.jsx';
 import ThankYou from './pages/ThankYou.jsx';
 import DashboardLayout from './components/DashboardLayout.jsx';
 import Dashboard from './pages/dashboard/Dashboard.jsx';
+import Estadisticas from './pages/dashboard/Estadisticas.jsx';
 import Usuarios from './pages/dashboard/Usuarios.jsx';
 import Productos from './pages/dashboard/Productos.jsx';
 import Encuestas from './pages/dashboard/Encuestas.jsx';
@@ -41,6 +42,7 @@ export default function App() {
           }
         >
           <Route index element={<Dashboard />} />
+          <Route path="estadisticas" element={<Estadisticas />} />
           <Route path="usuarios" element={<Usuarios />} />
           <Route path="productos" element={<Productos />} />
           <Route path="encuestas" element={<Encuestas />} />
